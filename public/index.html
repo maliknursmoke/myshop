@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYSHOP - Online Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">MY<span>SHOP</span></div>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#products">Products</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <button id="cartButton" class="cart-button">
+    Cart (<span id="cartCount">0</span>)
+  </button>
+</header>
+
+<section class="hero" id="home">
+  <div>
+    <p class="tag">WELCOME TO MYSHOP</p>
+    <h1>Shop Smart.<br>Live Better.</h1>
+    <p>Discover quality products at affordable prices.</p>
+    <a href="#products" class="shop-button">Shop Now</a>
+  </div>
+</section>
+
+<main>
+  <section id="products">
+    <div class="section-heading">
+      <div>
+        <p class="tag">OUR COLLECTION</p>
+        <h2>Featured Products</h2>
+      </div>
+      <input id="search" type="search"
+        placeholder="Search products...">
+    </div>
+
+    <div id="productGrid" class="product-grid">
+      Loading products...
+    </div>
+  </section>
+
+  <section id="cart" class="cart-section">
+    <h2>Your Shopping Cart</h2>
+    <div id="cartItems">Your cart is empty.</div>
+    <h3>Total: <span id="cartTotal">0</span> ETB</h3>
+
+    <button id="checkoutButton" class="shop-button">
+      Proceed to Checkout
+    </button>
+  </section>
+
+  <section id="checkout" class="checkout-section">
+    <h2>Checkout</h2>
+
+    <form id="checkoutForm">
+      <label>Full Name</label>
+      <input name="name" required maxlength="80"
+        placeholder="Your full name">
+
+      <label>Phone Number</label>
+      <input name="phone" required
+        placeholder="+251..." maxlength="20">
+
+      <label>Delivery Address</label>
+      <textarea name="address" required
+        maxlength="300" placeholder="Your address"></textarea>
+
+      <label>Payment Method</label>
+      <select name="paymentMethod" required>
+        <option value="Cash on Delivery">Cash on Delivery</option>
+        <option value="Bank Transfer">Bank Transfer</option>
+      </select>
+
+      <button type="submit" class="shop-button">
+        Place Order
+      </button>
+    </form>
+
+    <div id="orderMessage"></div>
+  </section>
+</main>
+
+<footer id="contact">
+  <h2>MYSHOP</h2>
+  <p>Your trusted online shopping destination.</p>
+  <p>© 2026 MYSHOP. All rights reserved.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

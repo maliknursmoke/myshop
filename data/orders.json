@@ -1,0 +1,22 @@
+[
+  {
+    "id": "b9760435-1088-4080-a656-b8501af2bc60",
+    "customer": {
+      "name": "malaw",
+      "phone": "0927409744",
+      "address": "addis abeba"
+    },
+    "items": [
+      {
+        "id": 2,
+        "name": "Premium Sneakers",
+        "price": 2500,
+        "quantity": 1
+      }
+    ],
+    "total": 2500,
+    "paymentMethod": "Bank Transfer",
+    "status": "Pending",
+    "createdAt": "2026-11-23T19:07:01.734Z"
+  }
+]
