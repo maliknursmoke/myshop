@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f3f5f8;
+  color: #202938;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: #172554;
+  color: white;
+  padding: 18px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+header a {
+  color: white;
+  text-decoration: none;
+}
+
+main {
+  width: min(900px, 94%);
+  margin: 25px auto;
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+
+h2, h3 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin: 13px 0 6px;
+}
+
+input, textarea {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd3df;
+  border-radius: 7px;
+  font-size: 16px;
+  background: white;
+}
+
+button {
+  background: #1d4ed8;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 15px;
+  margin: 8px 5px 0 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .6;
+}
+
+.secondary {
+  background: #64748b;
+}
+
+.danger {
+  background: #dc2626;
+}
+
+.actions, .toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.product {
+  display: flex;
+  gap: 15px;
+  padding: 15px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.product img {
+  width: 100px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #eee;
+}
+
+.details {
+  min-width: 0;
+  flex: 1;
+}
+
+.details h3 {
+  margin: 0 0 8px;
+}
+
+.details p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.available {
+  color: #15803d;
+  font-weight: bold;
+}
+
+.hidden-status {
+  color: #b45309;
+  font-weight: bold;
+}
+
+.message {
+  color: #b91c1c;
+  overflow-wrap: anywhere;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  main {
+    width: 96%;
+    margin: 12px auto;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .product {
+    gap: 10px;
+  }
+
+  .product img {
+    width: 82px;
+    height: 90px;
+  }
+
+  .toolbar {
+    align-items: flex-start;
+  }
+}

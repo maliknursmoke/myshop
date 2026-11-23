@@ -1,0 +1,4 @@
+node_modules/
+*.backup
+server.backup.js
+data.backup/
