@@ -14,6 +14,60 @@ const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 app.use(express.json({ limit: "20kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Send new order notification to Telegram
+async function sendTelegramNotification(order) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    console.warn("Telegram credentials are missing.");
+    return;
+  }
+
+  const itemLines = order.items.map(item =>
+    `- ${item.name} x ${item.quantity} = ${item.price * item.quantity} ETB`
+  );
+
+  const message = [
+    "🛍️ MYSHOP - NEW ORDER!",
+    "",
+    `Order ID: ${order.id}`,
+    `Customer: ${order.customer.name}`,
+    `Phone: ${order.customer.phone}`,
+    `Address: ${order.customer.address}`,
+    "",
+    "Products:",
+    ...itemLines,
+    "",
+    `Total: ${order.total} ETB`,
+    `Payment: ${order.paymentMethod}`,
+    `Status: ${order.status}`,
+    `Date: ${order.createdAt}`
+  ].join("\n");
+
+  const response = await fetch(
+    `https://api.telegram.org/bot${token}/sendMessage`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message
+      })
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.ok) {
+    throw new Error(result.description || "Telegram notification failed");
+  }
+
+  console.log("Telegram order notification sent.");
+}
+
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
@@ -159,7 +213,9 @@ app.post("/api/orders", (req, res) => {
       ORDERS_FILE,
       JSON.stringify(orders, null, 2)
     );
-
+sendTelegramNotification(order).catch(error => {
+  console.error("Telegram notification error:", error.message);
+});
     res.status(201).json({
       message: "Your order was received!",
       orderId: order.id,
