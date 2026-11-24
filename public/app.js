@@ -13,7 +13,248 @@ function saveCart() {
 
 async function loadProducts() {
   try {
-    const response = await fetch("/api/products");
+
+// ---------------- CUSTOMER ACCOUNT FRONTEND ----------------
+
+const customerNav = document.getElementById("customerNav");
+const customerWelcome = document.getElementById("customerWelcome");
+const customerAuth = document.getElementById("customerAuth");
+const customerAccount = document.getElementById("customerAccount");
+const authMessage = document.getElementById("authMessage");
+
+function openAuth(mode) {
+  customerAccount.hidden = true;
+  customerAuth.hidden = false;
+
+  document.getElementById("loginPanel").hidden = mode !== "login";
+  document.getElementById("registerPanel").hidden = mode !== "register";
+
+  authMessage.textContent = "";
+  customerAuth.scrollIntoView({ behavior: "smooth" });
+}
+
+document.getElementById("loginOpen").addEventListener("click", () => {
+  openAuth("login");
+});
+
+document.getElementById("registerOpen").addEventListener("click", () => {
+  openAuth("register");
+});
+
+document.getElementById("closeAuth").addEventListener("click", () => {
+  customerAuth.hidden = true;
+});
+
+async function loadCustomerSession() {
+  try {
+    const response = await fetch("/api/customer/me");
+
+    if (!response.ok) {
+      customerNav.hidden = false;
+      customerWelcome.hidden = true;
+      return;
+    }
+
+    const data = await response.json();
+    const customer = data.customer;
+
+    customerNav.hidden = true;
+    customerWelcome.hidden = false;
+    document.getElementById("welcomeName").textContent =
+      "Hello, " + customer.fullName;
+
+    document.querySelector('#checkoutForm [name="name"]').value =
+      customer.fullName;
+
+    document.querySelector('#checkoutForm [name="phone"]').value =
+      customer.phone;
+
+  } catch (error) {
+    console.error("Customer session error:", error);
+  }
+}
+
+// Customer registration
+document.getElementById("registerForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const form = event.target;
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  authMessage.textContent = "Creating your account...";
+
+  try {
+    const response = await fetch("/api/customer/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: form.elements.fullName.value.trim(),
+        email: form.elements.email.value.trim(),
+        phone: form.elements.phone.value.trim(),
+        password: form.elements.password.value
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Registration failed.");
+    }
+
+    authMessage.textContent = "Account created successfully!";
+    form.reset();
+    customerAuth.hidden = true;
+    await loadCustomerSession();
+
+  } catch (error) {
+    authMessage.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// Customer login
+document.getElementById("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const form = event.target;
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  authMessage.textContent = "Logging in...";
+
+  try {
+    const response = await fetch("/api/customer/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: form.elements.email.value.trim(),
+        password: form.elements.password.value
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Login failed.");
+    }
+
+    form.reset();
+    customerAuth.hidden = true;
+    await loadCustomerSession();
+
+  } catch (error) {
+    authMessage.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// Open account and order history
+document.getElementById("accountOpen").addEventListener("click", async () => {
+  customerAccount.hidden = false;
+  customerAuth.hidden = true;
+
+  const details = document.getElementById("accountDetails");
+  const ordersBox = document.getElementById("customerOrders");
+
+  details.textContent = "Loading account...";
+  ordersBox.textContent = "Loading orders...";
+
+  customerAccount.scrollIntoView({ behavior: "smooth" });
+
+  try {
+    const accountResponse = await fetch("/api/customer/me");
+
+    if (!accountResponse.ok) {
+      throw new Error("Please log in again.");
+    }
+
+    const accountData = await accountResponse.json();
+    const customer = accountData.customer;
+
+    details.textContent =
+      "Name: " + customer.fullName +
+      " | Email: " + customer.email +
+      " | Phone: " + customer.phone;
+
+    const ordersResponse = await fetch("/api/customer/orders");
+
+    if (!ordersResponse.ok) {
+      throw new Error("Unable to load orders.");
+    }
+
+    const ordersData = await ordersResponse.json();
+    ordersBox.innerHTML = "";
+
+    if (!ordersData.orders.length) {
+      ordersBox.textContent = "You haven't placed any orders yet.";
+      return;
+    }
+
+    ordersData.orders.forEach(order => {
+      const card = document.createElement("div");
+      card.className = "order-card";
+
+      const heading = document.createElement("h4");
+      heading.textContent = "Order #" + order.id;
+
+      const items = document.createElement("p");
+      items.textContent = order.items.map(item =>
+        item.name + " x " + item.quantity
+      ).join(", ");
+
+      const total = document.createElement("p");
+      total.textContent = "Total: " + Number(order.total).toLocaleString() + " ETB";
+
+      const status = document.createElement("p");
+      status.className = "order-status";
+      status.textContent = "Status: " + order.status;
+
+      const payment = document.createElement("p");
+      payment.textContent = "Payment: " + order.paymentMethod;
+
+      const date = document.createElement("p");
+      date.textContent = "Date: " + new Date(order.createdAt).toLocaleString();
+
+      card.append(heading, items, total, status, payment, date);
+      ordersBox.appendChild(card);
+    });
+
+  } catch (error) {
+    details.textContent = error.message;
+    ordersBox.textContent = "";
+  }
+});
+
+document.getElementById("closeAccount").addEventListener("click", () => {
+  customerAccount.hidden = true;
+});
+
+// Customer logout
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  try {
+    const response = await fetch("/api/customer/logout", {
+      method: "POST"
+    });
+
+    if (!response.ok) {
+      throw new Error("Logout failed.");
+    }
+
+    customerAccount.hidden = true;
+    customerAuth.hidden = true;
+    await loadCustomerSession();
+
+    alert("You have logged out.");
+
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+// Check whether a customer is already logged in
+loadCustomerSession();
+  const response = await fetch("/api/products");
     if (!response.ok) throw new Error("Could not load products");
 
     products = await response.json();

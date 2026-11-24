@@ -1,3 +1,4 @@
+END
 
 * {
   box-sizing: border-box;
@@ -211,5 +212,157 @@ footer {
 
   .hero {
     min-height: 330px;
+  }
+}
+
+/* CUSTOMER ACCOUNT SYSTEM */
+
+#customerNav,
+#customerWelcome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#customerWelcome span {
+  color: white;
+  font-weight: bold;
+}
+
+.account-section {
+  background: white;
+  max-width: 650px;
+  margin: 35px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px #0000000c;
+}
+
+.account-section h2 {
+  margin-bottom: 20px;
+  color: #101827;
+}
+
+.account-section h3 {
+  margin: 25px 0 12px;
+}
+
+.account-section label {
+  display: block;
+  font-weight: bold;
+}
+
+.account-section button {
+  margin: 5px 5px 5px 0;
+}
+
+#authMessage {
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.order-card {
+  border: 1px solid #e1e4e9;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 12px 0;
+  line-height: 1.8;
+}
+
+.order-status {
+  color: #a8751c;
+  font-weight: bold;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 500px) {
+  #customerNav,
+  #customerWelcome {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .account-section {
+    padding: 18px;
+  }
+}
+
+/* CUSTOMER ACCOUNT SYSTEM */
+
+#customerNav,
+#customerWelcome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#customerWelcome span {
+  color: white;
+  font-weight: bold;
+}
+
+.account-section {
+  background: white;
+  max-width: 650px;
+  margin: 35px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px #0000000c;
+}
+
+.account-section h2 {
+  margin-bottom: 20px;
+  color: #101827;
+}
+
+.account-section h3 {
+  margin: 25px 0 12px;
+}
+
+.account-section label {
+  display: block;
+  font-weight: bold;
+}
+
+.account-section button {
+  margin: 5px 5px 5px 0;
+}
+
+#authMessage {
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.order-card {
+  border: 1px solid #e1e4e9;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 12px 0;
+  line-height: 1.8;
+}
+
+.order-status {
+  color: #a8751c;
+  font-weight: bold;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 500px) {
+  #customerNav,
+  #customerWelcome {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .account-section {
+    padding: 18px;
   }
 }

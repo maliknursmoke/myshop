@@ -19,7 +19,15 @@
   </nav>
 
   <button id="cartButton" class="cart-button">
-    Cart (<span id="cartCount">0</span>)
+     <div id="customerNav">
+    <button id="loginOpen">Login</button>
+    <button id="registerOpen">Register</button>
+  </div>
+  <div id="customerWelcome" hidden>
+    <span id="welcomeName"></span>
+    <button id="accountOpen">My Account</button>
+    <button id="logoutButton">Logout</button>
+  </div> Cart (<span id="cartCount">0</span>)
   </button>
 </header>
 
@@ -33,7 +41,52 @@
 </section>
 
 <main>
-  <section id="products">
+   <section id="customerAuth" class="account-section" hidden>
+    <div id="loginPanel">
+      <h2>Customer Login</h2>
+      <form id="loginForm">
+        <label>Email</label>
+        <input name="email" type="email" required placeholder="Your email">
+
+        <label>Password</label>
+        <input name="password" type="password" required placeholder="Your password">
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+    <div id="registerPanel" hidden>
+      <h2>Create Customer Account</h2>
+      <form id="registerForm">
+        <label>Full Name</label>
+        <input name="fullName" required maxlength="100" placeholder="Your full name">
+
+        <label>Email</label>
+        <input name="email" type="email" required placeholder="Your email">
+
+        <label>Phone Number</label>
+        <input name="phone" required maxlength="20" placeholder="+251...">
+
+        <label>Password</label>
+        <input name="password" type="password" required minlength="8" placeholder="At least 8 characters">
+
+        <button type="submit">Create Account</button>
+      </form>
+    </div>
+
+    <div id="authMessage" role="status"></div>
+    <button id="closeAuth">Close</button>
+  </section>
+
+  <section id="customerAccount" class="account-section" hidden>
+    <h2>My Account</h2>
+    <div id="accountDetails"></div>
+
+    <h3>My Orders</h3>
+    <div id="customerOrders">Loading orders...</div>
+
+    <button id="closeAccount">Close Account</button>
+  </section> <section id="products">
     <div class="section-heading">
       <div>
         <p class="tag">OUR COLLECTION</p>
