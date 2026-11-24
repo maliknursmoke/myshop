@@ -3,9 +3,19 @@ const dashboard = document.getElementById("dashboard");
 const loginForm = document.getElementById("loginForm");
 const productForm = document.getElementById("productForm");
 const productList = document.getElementById("productList");
+const orderList = document.getElementById("orderList");
+const orderSummary = document.getElementById("orderSummary");
 
 const loginMessage = document.getElementById("loginMessage");
 const formMessage = document.getElementById("formMessage");
+
+const orderStatuses = [
+  "Pending",
+  "Confirmed",
+  "Shipped",
+  "Delivered",
+  "Cancelled"
+];
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
@@ -30,6 +40,7 @@ function showDashboard() {
   loginSection.hidden = true;
   dashboard.hidden = false;
   loadProducts();
+  loadOrders();
 }
 
 async function checkLogin() {
@@ -69,6 +80,154 @@ loginForm.addEventListener("submit", async event => {
   }
 });
 
+// ---------------- ORDER MANAGEMENT ----------------
+
+function makeElement(tag, text, className) {
+  const element = document.createElement(tag);
+  if (text !== undefined) element.textContent = text;
+  if (className) element.className = className;
+  return element;
+}
+
+async function loadOrders() {
+  orderList.textContent = "Loading customer orders...";
+  orderSummary.textContent = "";
+
+  try {
+    const orders = await api("/api/admin/orders");
+
+    orderSummary.textContent =
+      "Total orders: " + orders.length +
+      " | Pending: " + orders.filter(o => o.status === "Pending").length +
+      " | Confirmed: " + orders.filter(o => o.status === "Confirmed").length +
+      " | Shipped: " + orders.filter(o => o.status === "Shipped").length +
+      " | Delivered: " + orders.filter(o => o.status === "Delivered").length;
+
+    orderList.replaceChildren();
+
+    if (!orders.length) {
+      orderList.textContent = "No customer orders yet.";
+      return;
+    }
+
+    orders.forEach(order => {
+      const card = makeElement("article", undefined, "order-card");
+
+      const heading = makeElement(
+        "h3",
+        "Order #" + String(order.id).slice(0, 8)
+      );
+
+      const date = makeElement(
+        "p",
+        "Date: " + (
+          order.createdAt
+            ? new Date(order.createdAt).toLocaleString()
+            : "Not available"
+        )
+      );
+
+      const customer = order.customer || {};
+
+      const customerHeading = makeElement("h4", "Customer Details");
+      const customerName = makeElement("p", "Name: " + (customer.name || "N/A"));
+      const customerPhone = makeElement("p", "Phone: " + (customer.phone || "N/A"));
+      const customerAddress = makeElement(
+        "p",
+        "Delivery address: " + (customer.address || "N/A")
+      );
+
+      const itemsHeading = makeElement("h4", "Ordered Products");
+      const itemsList = makeElement("ul");
+
+      (Array.isArray(order.items) ? order.items : []).forEach(item => {
+        const itemText =
+          (item.name || "Product") +
+          " × " + Number(item.quantity || 0) +
+          " — " + (Number(item.price || 0) * Number(item.quantity || 0)).toLocaleString() +
+          " ETB";
+
+        itemsList.appendChild(makeElement("li", itemText));
+      });
+
+      const total = makeElement(
+        "p",
+        "Total: " + Number(order.total || 0).toLocaleString() + " ETB",
+        "order-total"
+      );
+
+      const payment = makeElement(
+        "p",
+        "Payment method: " + (order.paymentMethod || "N/A")
+      );
+
+      const statusLabel = makeElement(
+        "label",
+        "Order status: "
+      );
+
+      const statusSelect = document.createElement("select");
+
+      orderStatuses.forEach(status => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        option.selected = status === order.status;
+        statusSelect.appendChild(option);
+      });
+
+      statusLabel.appendChild(statusSelect);
+
+      const updateButton = makeElement("button", "Update Status");
+      updateButton.addEventListener("click", async () => {
+        updateButton.disabled = true;
+        updateButton.textContent = "Updating...";
+
+        try {
+          await api(
+            "/api/admin/orders/" + encodeURIComponent(order.id),
+            {
+              method: "PATCH",
+              body: JSON.stringify({ status: statusSelect.value })
+            }
+          );
+
+          await loadOrders();
+        } catch (error) {
+          alert(error.message);
+          updateButton.disabled = false;
+          updateButton.textContent = "Update Status";
+        }
+      });
+
+      card.append(
+        heading,
+        date,
+        customerHeading,
+        customerName,
+        customerPhone,
+        customerAddress,
+        itemsHeading,
+        itemsList,
+        total,
+        payment,
+        statusLabel,
+        updateButton
+      );
+
+      orderList.appendChild(card);
+    });
+
+  } catch (error) {
+    orderList.textContent = "Could not load orders: " + error.message;
+  }
+}
+
+document.getElementById("refreshOrdersButton")
+  .addEventListener("click", loadOrders);
+
+// ---------------- PRODUCT MANAGEMENT ----------------
+
 async function loadProducts() {
   productList.textContent = "Loading products...";
 
@@ -93,34 +252,31 @@ async function loadProducts() {
       const details = document.createElement("div");
       details.className = "details";
 
-      const name = document.createElement("h3");
-      name.textContent = product.name;
+      const name = makeElement("h3", product.name);
+      const category = makeElement("p", "Category: " + product.category);
+      const price = makeElement(
+        "p",
+        Number(product.price).toLocaleString() + " ETB"
+      );
+      const stock = makeElement("p", "Stock: " + product.stock);
 
-      const category = document.createElement("p");
-      category.textContent = "Category: " + product.category;
+      const status = makeElement(
+        "p",
+        product.active ? "Available" : "Hidden",
+        product.active ? "available" : "hidden-status"
+      );
 
-      const price = document.createElement("p");
-      price.textContent = Number(product.price).toLocaleString() + " ETB";
-
-      const stock = document.createElement("p");
-      stock.textContent = "Stock: " + product.stock;
-
-      const status = document.createElement("p");
-      status.textContent = product.active ? "Available" : "Hidden";
-      status.className = product.active ? "available" : "hidden-status";
-
-      const edit = document.createElement("button");
-      edit.textContent = "Edit";
+      const edit = makeElement("button", "Edit");
       edit.addEventListener("click", () => editProduct(product));
 
-      const toggle = document.createElement("button");
-      toggle.className = "secondary";
-      toggle.textContent = product.active ? "Hide" : "Show";
+      const toggle = makeElement(
+        "button",
+        product.active ? "Hide" : "Show",
+        "secondary"
+      );
       toggle.addEventListener("click", () => toggleProduct(product));
 
-      const remove = document.createElement("button");
-      remove.className = "danger";
-      remove.textContent = "Delete";
+      const remove = makeElement("button", "Delete", "danger");
       remove.addEventListener("click", () => deleteProduct(product));
 
       details.append(name, category, price, stock, status, edit, toggle, remove);
@@ -159,7 +315,8 @@ function resetProductForm() {
   formMessage.textContent = "";
 }
 
-document.getElementById("cancelEdit").addEventListener("click", resetProductForm);
+document.getElementById("cancelEdit")
+  .addEventListener("click", resetProductForm);
 
 productForm.addEventListener("submit", async event => {
   event.preventDefault();
@@ -224,7 +381,8 @@ async function deleteProduct(product) {
   }
 }
 
-document.getElementById("refreshButton").addEventListener("click", loadProducts);
+document.getElementById("refreshButton")
+  .addEventListener("click", loadProducts);
 
 document.getElementById("logoutButton").addEventListener("click", async () => {
   try {

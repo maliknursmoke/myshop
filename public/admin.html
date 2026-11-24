@@ -30,11 +30,26 @@
 
     <section id="dashboard" hidden>
       <div class="toolbar">
-        <h2>Product Management</h2>
+        <h2>Admin Dashboard</h2>
         <button id="logoutButton" class="secondary">Log Out</button>
       </div>
 
+      <!-- ORDER MANAGEMENT -->
       <section class="panel">
+        <div class="toolbar">
+          <h2>Customer Orders</h2>
+          <button id="refreshOrdersButton" class="secondary">
+            Refresh Orders
+          </button>
+        </div>
+
+        <div id="orderSummary"></div>
+        <div id="orderList">Loading orders...</div>
+      </section>
+
+      <!-- PRODUCT MANAGEMENT -->
+      <section class="panel">
+        <h2>Product Management</h2>
         <h3 id="formTitle">Add New Product</h3>
 
         <form id="productForm">
