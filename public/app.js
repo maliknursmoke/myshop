@@ -21,7 +21,19 @@ const customerWelcome = document.getElementById("customerWelcome");
 const customerAuth = document.getElementById("customerAuth");
 const customerAccount = document.getElementById("customerAccount");
 const authMessage = document.getElementById("authMessage");
+function showCustomer(customer) {
+  customerNav.hidden = true;
+  customerWelcome.hidden = false;
 
+  const name = customer.fullName || customer.full_name;
+
+  document.getElementById("welcomeName").textContent =
+    "Hello, " + name;
+
+  document.querySelector('#checkoutForm [name="name"]').value = name;
+  document.querySelector('#checkoutForm [name="phone"]').value =
+    customer.phone;
+}
 function openAuth(mode) {
   customerAccount.hidden = true;
   customerAuth.hidden = false;
@@ -58,16 +70,7 @@ async function loadCustomerSession() {
     const data = await response.json();
     const customer = data.customer;
 
-    customerNav.hidden = true;
-    customerWelcome.hidden = false;
-    document.getElementById("welcomeName").textContent =
-      "Hello, " + customer.fullName;
-
-    document.querySelector('#checkoutForm [name="name"]').value =
-      customer.fullName;
-
-    document.querySelector('#checkoutForm [name="phone"]').value =
-      customer.phone;
+   showCustomer(customer);
 
   } catch (error) {
     console.error("Customer session error:", error);
@@ -102,9 +105,9 @@ document.getElementById("registerForm").addEventListener("submit", async event =
     }
 
     authMessage.textContent = "Account created successfully!";
-    form.reset();
-    customerAuth.hidden = true;
-    await loadCustomerSession();
+form.reset();
+customerAuth.hidden = true;
+showCustomer(result.customer);
 
   } catch (error) {
     authMessage.textContent = error.message;
@@ -138,9 +141,9 @@ document.getElementById("loginForm").addEventListener("submit", async event => {
       throw new Error(result.error || "Login failed.");
     }
 
-    form.reset();
-    customerAuth.hidden = true;
-    await loadCustomerSession();
+   form.reset();
+customerAuth.hidden = true;
+showCustomer(result.customer);
 
   } catch (error) {
     authMessage.textContent = error.message;
